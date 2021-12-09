@@ -85,6 +85,68 @@ class INode(object):
         """Show all input and output Plugs."""
         return self.__unicode__().encode('utf-8').decode()
 
+    def __eq__(self, other):
+        """Two INodes are considered to be equal if they meet these criteria:
+
+        - They are of the same type
+        - They have the same `class_name`
+        - They have the same `is_dirty` state
+        - They have the same upstream nodes
+        - They have he same input plug names and values
+        """
+        if isinstance(self, INode) != isinstance(other, INode):
+            return False
+        if self.class_name != other.class_name:
+            return False
+        if self.is_dirty != other.is_dirty:
+            return False
+
+        this_upstream = {n.name for n in self.upstream_nodes}
+        other_upstream = {n.name for n in other.upstream_nodes}
+        if this_upstream != other_upstream:
+            return False
+
+        this_input_plugs = {i for i in self.inputs.values()}
+        other_input_plugs = {i for i in other.inputs.values()}
+
+        print(this_input_plugs, other_input_plugs)
+
+        if this_input_plugs != other_input_plugs:
+            return False
+
+
+
+        return True
+
+
+        # same = True
+
+        # up1 = {n.name for n in node1.upstream_nodes}
+        # up2 = {n.name for n in node2.upstream_nodes}
+        # if up1 != up2:
+        #     same = False
+
+        # in1 = {in_name: in_.value for in_name, in_ in node1.inputs.items()}
+        # in2 = {in_name: in_.value for in_name, in_ in node2.inputs.items()}
+        # if in1 != in2:
+        #     same = False
+
+        # out1 = {in_name: in_.value for in_name, in_ in node1.outputs.items()}
+        # out2 = {in_name: in_.value for in_name, in_ in node2.outputs.items()}
+        # if out1 != out2:
+        #     same = False
+
+        # if node1.is_dirty != node2.is_dirty:
+        #     same = False
+
+        return same
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
     @property
     def is_dirty(self):
         """Whether any of the input Plug data has changed and is dirty."""

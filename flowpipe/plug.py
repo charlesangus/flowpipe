@@ -61,6 +61,32 @@ class IPlug(object):
                       DeprecationWarning, stacklevel=2)
         self.disconnect(other)
 
+    def __eq__(self, other):
+        """Two IPlugs are considered to be equal if they meet these criteria:
+
+        - They are of the same type
+        - They have the same name
+        - They have same value
+        - They have same connections
+        """
+        if isinstance(self, IPlug) != isinstance(other, IPlug):
+            return False
+        if type(self) != type(other):
+            return False
+        if self.name != other.name:
+            return False
+        if self.value != other.value:
+            return False
+        if {c for c in self.connections} != {c for c in other.connections}:
+            return False
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
     # Extra function to make re-use in subclasses easier
     def _update_value(self, value):
         """Update the internal value."""
